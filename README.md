@@ -2,7 +2,7 @@
 
 Student ID: 251968
 Name: Aset Kamza
-Group: SE
+Group: SE - 2532
 Maze size (rows x columns): 12 x 9
 
 This file is the report. Fill it in as you go. How to start: `START_HERE.md`. The task: `docs/Assignment3.pdf`.
