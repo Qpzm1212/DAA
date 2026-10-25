@@ -5,30 +5,59 @@
  */
 public class DisjointSet {
 
+    private final int[] parent;
+    private final int[] size;
+    private int count;
+
     public DisjointSet(int n) {
-        // TODO
+        this.parent = new int[n];
+        this.size = new int[n];
+        this.count = n;
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+            size[i] = 1;
+        }
     }
 
     /** The root of the set that contains x. */
     public int find(int x) {
-        // TODO
-        return x;
+        int root = x;
+        while (parent[root] != root) {
+            root = parent[root];
+        }
+        int curr = x;
+        while (curr != root) {
+            int next = parent[curr];
+            parent[curr] = root;
+            curr = next;
+        }
+        return root;
     }
 
     /** Joins the sets of a and b. Returns true if they were different sets, false if they were already one set. */
     public boolean union(int a, int b) {
-        // TODO
-        return false;
+        int rootA = find(a);
+        int rootB = find(b);
+        if (rootA == rootB) {
+            return false;
+        }
+        if (size[rootA] < size[rootB]) {
+            parent[rootA] = rootB;
+            size[rootB] += size[rootA];
+        } else {
+            parent[rootB] = rootA;
+            size[rootA] += size[rootB];
+        }
+        count--;
+        return true;
     }
 
     public boolean connected(int a, int b) {
-        // TODO
-        return false;
+        return find(a) == find(b);
     }
 
     /** Number of sets now. */
     public int count() {
-        // TODO
-        return 0;
+        return count;
     }
 }
