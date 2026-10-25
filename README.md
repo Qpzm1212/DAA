@@ -1,9 +1,9 @@
 # Assignment 3. Maze Escape
 
-Student ID: YOUR_STUDENT_ID
+Student ID: 251968
 Name: Aset Kamza
 Group: SE
-Maze size (rows x columns): (update after running `java tools/MakeVariant.java YOUR_STUDENT_ID data`)
+Maze size (rows x columns): 12 x 9
 
 This file is the report. Fill it in as you go. How to start: `START_HERE.md`. The task: `docs/Assignment3.pdf`.
 
@@ -11,19 +11,19 @@ This file is the report. Fill it in as you go. How to start: `START_HERE.md`. Th
 
 The 13 lines your program prints on your data (`java -cp out Main`):
 
-    Broken: 
-    Kept: 
-    Last broken wall: 
-    MST cost: 
-    Heaviest broken wall: 
-    Path length: 
-    DFS visited: 
-    Dead ends: 
-    Zones: 
-    Largest zone: 
-    Is DAG: 
-    Flow stages: 
-    Fastest route cost: 
+    Broken: 107
+    Kept: 88
+    Last broken wall: 158
+    MST cost: 35172
+    Heaviest broken wall: 743
+    Path length: 29
+    DFS visited: 54
+    Dead ends: 32
+    Zones: 108
+    Largest zone: 1
+    Is DAG: 1
+    Flow stages: 21
+    Fastest route cost: 19
 
 My maze:
 
@@ -39,11 +39,11 @@ Mission 0. What do find and union do, and what makes them fast in your code?
 
 Mission 1. Why is Broken always R*C - 1, and Kept always (R-1)*(C-1)?
 
-Breaking walls without creating cycles builds a spanning tree over all $R \cdot C$ cells, and any tree with $V = R \cdot C$ vertices has exactly $V - 1 = R \cdot C - 1$ edges (broken walls). A grid of $R$ rows and $C$ columns has $(R - 1)C$ horizontal inner walls and $R(C - 1)$ vertical inner walls, giving $2RC - R - C$ inner walls in total. Subtracting the $RC - 1$ broken walls leaves $(2RC - R - C) - (RC - 1) = RC - R - C + 1 = (R - 1)(C - 1)$ walls standing.
+Breaking walls without creating cycles builds a spanning tree over all $R \cdot C$ cells, and any tree with $V = R \cdot C$ vertices has exactly $V - 1 = R \cdot C - 1$ edges (broken walls, which is $12 \times 9 - 1 = 107$ in my maze). A grid of $R$ rows and $C$ columns has $(R - 1)C$ horizontal inner walls and $R(C - 1)$ vertical inner walls, giving $2RC - R - C$ inner walls in total ($195$ walls). Subtracting the $RC - 1$ broken walls leaves $(2RC - R - C) - (RC - 1) = RC - R - C + 1 = (R - 1)(C - 1)$ walls standing ($11 \times 8 = 88$).
 
 Mission 2. My MST cost from Kruskal and from Prim, and why they are equal:
 
-Both Kruskal's algorithm and Prim's algorithm compute a Minimum Spanning Tree of the same connected weighted graph. Because all wall costs in `walls.txt` are distinct, the minimum spanning tree is unique, so both greedy strategies (Kruskal adding the globally cheapest safe edge and Prim growing a single tree by adding the cheapest frontier edge) select the exact same set of walls and produce the exact same total MST cost.
+Both Kruskal's algorithm and Prim's algorithm give an MST cost of `35172` (with heaviest broken wall `743`). Because all wall costs in `walls.txt` are distinct, the minimum spanning tree of the graph is unique, so both greedy strategies (Kruskal adding the globally cheapest safe wall and Prim growing a single tree from cell `0` by adding the cheapest frontier wall) select the exact same spanning tree and total cost.
 
 Mission 3. Why is there exactly one path between two cells? How did you avoid a stack overflow on a huge maze?
 
@@ -51,11 +51,11 @@ Because Mission 1 only breaks a wall when its two endpoint cells belong to diffe
 
 Mission 4. Why does the second pass of Kosaraju go on the reversed graph? Why do the slides have no cycle exactly when Zones equals the number of cells?
 
-The first DFS records vertices by finish time so that if zone $X$ has a slide to zone $Y$, the last-finished vertex among them belongs to the source component $X$; traversing the reversed graph from that vertex prevents DFS from escaping into $Y$ (since the edge $X \to Y$ is reversed to $Y \to X$), isolating exactly the vertices of $X$ and numbering zones in topological order. A directed cycle makes at least two cells mutually reachable so they merge into a single zone of size $\ge 2$ (making `Zones < n`), whereas having no cycles means no two distinct cells can reach each other, so every cell forms its own zone of size 1 (`Zones == n`).
+The first DFS records vertices by finish time so that if zone $X$ has a slide to zone $Y$, the last-finished vertex among them belongs to the source component $X$; traversing the reversed graph from that vertex prevents DFS from escaping into $Y$ (since the edge $X \to Y$ is reversed to $Y \to X$), isolating exactly the vertices of $X$ and numbering zones in topological order. A directed cycle makes at least two cells mutually reachable so they merge into a single zone of size $\ge 2$ (making `Zones < n`), whereas having no cycles means no two distinct cells can reach each other, so every cell forms its own zone of size 1 (`Zones == n`, which is `108` in my variant, so `Is DAG: 1`).
 
 Mission 5. Why is it enough to go through the zones in the order of their numbers? What does this pass cost?
 
-Condensing strongly connected components produces a Directed Acyclic Graph (DAG), and the second pass of Kosaraju assigns zone numbers in topological order where every inter-zone edge goes from a smaller zone number $X$ to a larger zone number $Y$ ($X < Y$). When we reach zone $z$ in increasing order $0, 1, \dots, \text{zones}-1$, all incoming transitions into $z$ have already been relaxed, so a single linear pass computes both `Flow stages` and `Fastest route cost` in $O(V_{\text{zones}} + E_{\text{zones}}) = O(n + S)$ time and $O(n + S)$ space without needing a priority queue.
+Condensing strongly connected components produces a Directed Acyclic Graph (DAG), and the second pass of Kosaraju assigns zone numbers in topological order where every inter-zone edge goes from a smaller zone number $X$ to a larger zone number $Y$ ($X < Y$). When we reach zone $z$ in increasing order $0, 1, \dots, \text{zones}-1$, all incoming transitions into $z$ have already been relaxed, so a single linear pass computes both `Flow stages` (`21`) and `Fastest route cost` (`19`) in $O(V_{\text{zones}} + E_{\text{zones}}) = O(n + S)$ time and $O(n + S)$ space without needing a priority queue.
 
 ## AI use
 
